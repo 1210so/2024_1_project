@@ -2,12 +2,10 @@ package resume.resumegenerator.domain.entity;
 
 /**
  * 1. 개인정보 entity
- * id, name, birth, ssn, contact, email, address
+ * userId, name(이름), birth(생년월일), ssn(주민등록번호), contact(전화번호), emergencyContact(비상연락처), email(이메일주소), address(집주소)
  * emergencyContact - 필수 X
  */
-
-public class PersonalInfo {
-    private Long id;
+public class PersonalInfo extends BaseEntity {
     private String name;
     private String birth;
     private String ssn;
@@ -28,13 +26,6 @@ public class PersonalInfo {
         this.address = address;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

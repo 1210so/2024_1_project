@@ -1,153 +1,64 @@
 package resume.resumegenerator.controller;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import resume.resumegenerator.domain.entity.PersonalInfo;
-import resume.resumegenerator.repository.PersonalInfoRepository;
-import resume.resumegenerator.repository.repositoryImpl.PersonalInfoRepositoryImpl;
+import resume.resumegenerator.store.PersonalInfoStore;
 
 /**
- * HTTP API 사용 버전
- * application/x-www-form-urlencoded 방식으로 서버에 데이터를 전송하면 JSON 방식으로 데이터 반환
+ * 1. 개인정보 컨트롤러
+ * 컨트롤러에서 PersonalInfoStore 빈을 주입 받아 데이터 관리
  */
-
 @RestController
 @RequestMapping("/personal-info")
-@RequiredArgsConstructor
 public class PersonalInfoController {
-    private final PersonalInfoRepository repository = new PersonalInfoRepositoryImpl();
 
-    /**
-     * 클라이언트가 처음 정보를 입력 시작시 호출
-     * 새 PersonalInfo 객체 생성 후 저장
-     */
-    @PostMapping("/start")
-    public ResponseEntity<PersonalInfo> start() {
-        PersonalInfo info = new PersonalInfo();
-        info = repository.save(info);
-        return ResponseEntity.ok(info);
+    private final PersonalInfoStore personalInfoStore;
+
+    @Autowired
+    public PersonalInfoController(PersonalInfoStore personalInfoStore) {
+        this.personalInfoStore = personalInfoStore;
     }
 
     /**
-     * 클라이언트의 이름 필드를 입력
-     * @param infoId
-     * @param name
-     * @return
+     * 입력된 개인정보를 personalInfoStore에 저장
      */
-
-    @PostMapping("/name")
-    public ResponseEntity<PersonalInfo> submitName(@RequestParam Long infoId, @RequestParam String name) {
-        PersonalInfo info = repository.findById(infoId);
-        if (info != null) {
-            info.setName(name);
-            repository.update(infoId, info);
-            return ResponseEntity.ok(info);
+    @PostMapping("/save")
+    public ResponseEntity<PersonalInfo> savePersonalInfo(@RequestBody PersonalInfo personalInfo) {
+        PersonalInfo savedInfo = personalInfoStore.save(personalInfo);
+        if (savedInfo != null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedInfo);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     /**
-     * 클라이언트의 생년월일을 입력
-     * @param infoId
-     * @param birth
-     * @return
+     * 수정된 개인정보를 personalInfoStore에 업데이트
      */
-
-    @PostMapping("/birth")
-    public ResponseEntity<PersonalInfo> submitBirth(@RequestParam Long infoId, @RequestParam String birth) {
-        PersonalInfo info = repository.findById(infoId);
-        if (info != null) {
-            info.setBirth(birth);
-            repository.update(infoId, info);
-            return ResponseEntity.ok(info);
+    @PostMapping("/update/{userId}")
+    public ResponseEntity<PersonalInfo> updatePersonalInfo(@PathVariable Long userId, @RequestBody PersonalInfo personalInfo) {
+        if (!personalInfoStore.existsById(userId)) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
+
+        personalInfo.setUserId(userId);
+        PersonalInfo updatedInfo = personalInfoStore.update(userId, personalInfo);
+        return ResponseEntity.ok(updatedInfo);
     }
 
     /**
-     * 클라이언트의 주민등록번호 입력
-     * @param infoId
-     * @param ssn
-     * @return
+     * userId로 저장된 개인정보 조회
      */
-
-    @PostMapping("/ssn")
-    public ResponseEntity<PersonalInfo> submitSsn(@RequestParam Long infoId, @RequestParam String ssn) {
-        PersonalInfo info = repository.findById(infoId);
-        if (info != null) {
-            info.setSsn(ssn);
-            repository.update(infoId, info);
-            return ResponseEntity.ok(info);
+    @GetMapping("/{userId}")
+    public ResponseEntity<PersonalInfo> getPersonalInfo(@PathVariable Long userId) {
+        PersonalInfo personalInfo = personalInfoStore.findById(userId);
+        if (personalInfo == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(personalInfo);
         }
-        return ResponseEntity.notFound().build();
-    }
-
-    /**
-     * 클라이언트의 전화번호 입력
-     * @param infoId
-     * @param contact
-     * @return
-     */
-
-    @PostMapping("/contact")
-    public ResponseEntity<PersonalInfo> submitContact(@RequestParam Long infoId, @RequestParam String contact){
-        PersonalInfo info = repository.findById(infoId);
-        if (info != null) {
-            info.setContact(contact);
-            repository.update(infoId, info);
-            return ResponseEntity.ok(info);
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    /**
-     * 클라이언트의 이메일 주소 입력
-     * @param infoId
-     * @param email
-     * @return
-     */
-
-    @PostMapping("/email")
-    public ResponseEntity<PersonalInfo> submitEmail(@RequestParam Long infoId, @RequestParam String email) {
-        PersonalInfo info = repository.findById(infoId);
-        if (info != null) {
-            info.setEmail(email);
-            repository.update(infoId, info);
-            return ResponseEntity.ok(info);
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    /**
-     * 클라이언트의 주소 입력
-     * @param infoId
-     * @param address
-     * @return
-     */
-
-    @PostMapping("/address")
-    public ResponseEntity<PersonalInfo> submitAddress(@RequestParam Long infoId, @RequestParam String address) {
-        PersonalInfo info = repository.findById(infoId);
-        if (info != null) {
-            info.setAddress(address);
-            repository.update(infoId, info);
-            return ResponseEntity.ok(info);
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    /**
-     * infoId에 해당하는 PersonalInfo 객체 정보를 조회하여 반환
-     * @param infoId
-     * @return
-     */
-    @GetMapping("/review/{infoId}")
-    public ResponseEntity<PersonalInfo> reviewPersonalInfo(@PathVariable Long infoId) {
-        PersonalInfo info = repository.findById(infoId);
-        if (info != null) {
-            return ResponseEntity.ok(info);
-        }
-        return ResponseEntity.notFound().build();
     }
 }
