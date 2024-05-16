@@ -5,7 +5,6 @@ package resume.resumegenerator.domain.entity;
  * id, highestEdu(최종 학력), schoolName(학교명), major(전공 계열), detailedMajor(세부 전공)
  */
 public class AcademicInfo extends BaseEntity{
-
     private String highestEdu;
     private String schoolName;
     private String major;

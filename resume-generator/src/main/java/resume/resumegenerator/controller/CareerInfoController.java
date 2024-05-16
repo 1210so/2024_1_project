@@ -10,7 +10,7 @@ import resume.resumegenerator.store.CareerInfoStore;
 import java.util.List;
 
 /**
- * 3. 경력 컨트롤러
+ * 3. 경력 정보 컨트롤러
  * 컨트롤러에서 CareerInfoStore 빈을 주입 받아 데이터 관리
  */
 @RestController
@@ -34,10 +34,9 @@ public class CareerInfoController {
     }
 
     /**
-     * 수정된 경력을 careerInfoStore에 업데이트
+     * 수정된 경력을 CareerInfoStore에 업데이트
      * - List<CareerInfo> 형식에 맞춰 JSON 배열로 전송받아야 함
      */
-
     @PostMapping("/update/{userId}")
     public ResponseEntity<List<CareerInfo>> updateCareerInfo(@PathVariable Long userId, @RequestBody List<CareerInfo> newCareers) {
         if (newCareers == null) {

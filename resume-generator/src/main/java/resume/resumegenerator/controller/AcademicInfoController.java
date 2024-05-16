@@ -8,7 +8,7 @@ import resume.resumegenerator.domain.entity.AcademicInfo;
 import resume.resumegenerator.store.AcademicInfoStore;
 
 /**
- * 1. 학력 컨트롤러
+ * 2. 학력 정보 컨트롤러
  * 컨트롤러에서 AcademicInfoStore 빈을 주입 받아 데이터 관리
  */
 @RestController
@@ -36,7 +36,7 @@ public class AcademicInfoController {
     }
 
     /**
-     * 수정된 학력을 academicInfoStore에 업데이트
+     * 수정된 학력을 AcademicInfoStore에 업데이트
      */
     @PostMapping("/update/{userId}")
     public ResponseEntity<AcademicInfo> updateAcademicInfo(@PathVariable Long userId, @RequestBody AcademicInfo academicInfo) {
